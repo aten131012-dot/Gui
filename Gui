@@ -1,0 +1,843 @@
+local Players=game:GetService("Players")
+local TS=game:GetService("TweenService")
+local UIS=game:GetService("UserInputService")
+local LOGO="rbxassetid://111781537714645"
+local LIN=Enum.EasingStyle.Linear
+local SINE=Enum.EasingStyle.Sine
+local IO=Enum.EasingDirection.InOut
+
+local COL={
+ Bg=Color3.fromRGB(8,6,20),
+ Side=Color3.fromRGB(26,18,52),
+ Chip=Color3.fromRGB(34,24,68),
+ Purple=Color3.fromRGB(140,80,255),
+ Pink=Color3.fromRGB(215,125,255),
+ Text=Color3.fromRGB(242,235,255),
+ Sub=Color3.fromRGB(165,150,200),
+ Red=Color3.fromRGB(255,80,110),
+ Green=Color3.fromRGB(90,230,160),
+}
+local function make(c,p,par)
+ local o=Instance.new(c)
+ for k,v in pairs(p) do o[k]=v end
+ o.Parent=par
+ return o
+end
+local function round(o,r) return make("UICorner",{CornerRadius=UDim.new(0,r)},o) end
+
+-- ระบบเปลี่ยนสีธีม
+local accents={}
+local function onAccent(fn) accents[#accents+1]=fn fn(COL.Purple,COL.Pink) end
+local function setAccent(a,b) COL.Purple=a COL.Pink=b for _,fn in ipairs(accents) do fn(a,b) end end
+local function glow(o,t)
+ local s=make("UIStroke",{Thickness=t or 1.5,Color=Color3.new(1,1,1),ApplyStrokeMode=Enum.ApplyStrokeMode.Border},o)
+ local g=make("UIGradient",{},s)
+ onAccent(function(a,b) g.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,a),ColorSequenceKeypoint.new(.5,b),ColorSequenceKeypoint.new(1,a)}) end)
+ TS:Create(g,TweenInfo.new(4,LIN,Enum.EasingDirection.In,-1),{Rotation=360}):Play()
+ return s
+end
+
+local parent=(gethui and gethui()) or game:GetService("CoreGui")
+if parent:FindFirstChild("NexoraHubUI") then parent.NexoraHubUI:Destroy() end
+local gui=make("ScreenGui",{Name="NexoraHubUI",ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},parent)
+
+local win=make("CanvasGroup",{AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(540,336),Position=UDim2.new(.5,0,.5,0),BackgroundTransparency=1,GroupTransparency=1,Visible=false},gui)
+round(win,26)
+local bgf=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundColor3=Color3.new(1,1,1)},win)
+round(bgf,26) glow(bgf,1.5)
+make("UIGradient",{Color=ColorSequence.new(Color3.fromRGB(22,12,50),Color3.fromRGB(5,4,14)),Rotation=90},bgf)
+local sc=make("UIScale",{Scale=.05},win)
+
+local lang="EN"
+local labels={}
+local function L(o,en,th) labels[#labels+1]={o,en,th} o.Text=en return o end
+local space=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,ClipsDescendants=true},bgf)
+local spaceOn=true
+
+-- เนบิวลา
+local function blob(x,y,s,col,dx,dy,t)
+ local h=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(x,y),Size=UDim2.fromOffset(s,s),BackgroundTransparency=1},space)
+ for i=1,4 do
+  local k=1-(i-1)*.2
+  local c=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromScale(k,k),BackgroundColor3=col,BackgroundTransparency=.93,BorderSizePixel=0},h)
+  make("UICorner",{CornerRadius=UDim.new(.5,0)},c)
+ end
+ TS:Create(h,TweenInfo.new(t,SINE,IO,-1,true),{Position=UDim2.fromScale(x+dx,y+dy)}):Play()
+end
+blob(.15,.25,280,Color3.fromRGB(110,50,210),.08,.1,9)
+blob(.85,.8,320,Color3.fromRGB(40,80,220),-.1,-.08,11)
+blob(.6,.1,220,Color3.fromRGB(220,70,190),-.06,.12,8)
+
+-- ดาวกะพริบ
+for i=1,52 do
+ local sz=math.random(1,2)+((math.random()<.12) and 1 or 0)
+ local s=make("Frame",{Position=UDim2.fromScale(math.random(),math.random()),Size=UDim2.fromOffset(sz,sz),BackgroundColor3=(math.random()<.3) and COL.Pink or Color3.new(1,1,1),BackgroundTransparency=math.random(30,70)/100,BorderSizePixel=0},space)
+ make("UICorner",{CornerRadius=UDim.new(.5,0)},s)
+ TS:Create(s,TweenInfo.new(math.random(8,25)/10,SINE,IO,-1,true),{BackgroundTransparency=.95}):Play()
+end
+
+-- ดาวเคราะห์ + วงแหวน
+local planet=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.95,.07),Size=UDim2.fromOffset(60,60),BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=.3},space)
+make("UICorner",{CornerRadius=UDim.new(.5,0)},planet)
+make("UIGradient",{Color=ColorSequence.new(Color3.fromRGB(200,130,255),Color3.fromRGB(35,18,85)),Rotation=45},planet)
+local ringp=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(104,26),BackgroundTransparency=1,Rotation=-22},planet)
+make("UICorner",{CornerRadius=UDim.new(.5,0)},ringp)
+make("UIStroke",{Color=COL.Pink,Thickness=2,Transparency=.5},ringp)
+TS:Create(planet,TweenInfo.new(7,SINE,IO,-1,true),{Position=UDim2.fromScale(.95,.1)}):Play()
+
+-- ดาวตก
+task.spawn(function()
+ while gui:IsDescendantOf(game) do
+  task.wait(math.random(25,60)/10)
+  if spaceOn and win.Visible then
+   local x,y=math.random(5,60)/100,math.random(0,30)/100
+   local s=make("Frame",{AnchorPoint=Vector2.new(1,.5),Position=UDim2.fromScale(x,y),Size=UDim2.fromOffset(64,2),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0,Rotation=35},space)
+   make("UIGradient",{Transparency=NumberSequence.new(1,0)},s)
+   TS:Create(s,TweenInfo.new(.8,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Position=UDim2.fromScale(x+.35,y+.4)}):Play()
+   task.delay(.9,function() s:Destroy() end)
+  end
+ end
+end)
+local function setSpace(v) spaceOn=v space.Visible=v end
+local top=make("Frame",{Size=UDim2.new(1,0,0,46),BackgroundTransparency=1},win)
+local lg=make("ImageLabel",{Size=UDim2.fromOffset(30,30),Position=UDim2.fromOffset(14,8),BackgroundColor3=COL.Side,Image=LOGO},top)
+round(lg,15) glow(lg,1.5)
+local title=make("TextLabel",{Position=UDim2.fromOffset(52,4),Size=UDim2.fromOffset(150,20),BackgroundTransparency=1,Text="NEXORA HUB",Font=Enum.Font.GothamBlack,TextSize=16,TextColor3=Color3.new(1,1,1),TextXAlignment=Enum.TextXAlignment.Left},top)
+local tg=make("UIGradient",{Offset=Vector2.new(-1,0)},title)
+onAccent(function(a,b) tg.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,a),ColorSequenceKeypoint.new(.5,Color3.new(1,1,1)),ColorSequenceKeypoint.new(1,b)}) end)
+TS:Create(tg,TweenInfo.new(2.2,LIN,Enum.EasingDirection.In,-1,false,1.2),{Offset=Vector2.new(1,0)}):Play()
+local sub=make("TextLabel",{Position=UDim2.fromOffset(52,24),Size=UDim2.new(1,-210,0,12),BackgroundTransparency=1,Text=game.Name,Font=Enum.Font.Gotham,TextSize=10,TextColor3=COL.Sub,TextXAlignment=Enum.TextXAlignment.Left,TextTruncate=Enum.TextTruncate.AtEnd},top)
+
+local langF=make("Frame",{Size=UDim2.fromOffset(72,24),Position=UDim2.new(1,-148,0,11),BackgroundColor3=COL.Side},top)
+round(langF,12)
+local function lbtn(x,t)
+ local b=make("TextButton",{Size=UDim2.new(.5,0,1,0),Position=UDim2.fromScale(x,0),BackgroundColor3=COL.Purple,Text=t,Font=Enum.Font.GothamBold,TextSize=10,TextColor3=COL.Text,AutoButtonColor=false},langF)
+ round(b,12)
+ onAccent(function(a) b.BackgroundColor3=a end)
+ return b
+end
+local enB,thB=lbtn(0,"EN"),lbtn(.5,"TH")
+local function setLang(l)
+ lang=l
+ for _,v in ipairs(labels) do v[1].Text=(l=="TH") and v[3] or v[2] end
+ enB.BackgroundTransparency=(l=="EN") and 0 or 1
+ thB.BackgroundTransparency=(l=="TH") and 0 or 1
+end
+enB.MouseButton1Click:Connect(function() setLang("EN") end)
+thB.MouseButton1Click:Connect(function() setLang("TH") end)
+
+local function tbtn(x,txt,col)
+ local b=make("TextButton",{Size=UDim2.fromOffset(26,26),Position=UDim2.new(1,x,0,10),BackgroundColor3=col,Text=txt,Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1),AutoButtonColor=false},top)
+ round(b,13)
+ b.MouseEnter:Connect(function() TS:Create(b,TweenInfo.new(.15),{Size=UDim2.fromOffset(30,30),Position=UDim2.new(1,x-2,0,8)}):Play() end)
+ b.MouseLeave:Connect(function() TS:Create(b,TweenInfo.new(.15),{Size=UDim2.fromOffset(26,26),Position=UDim2.new(1,x,0,10)}):Play() end)
+ return b
+end
+local minB=tbtn(-68,"–",COL.Purple)
+local clsB=tbtn(-36,"X",COL.Red)
+onAccent(function(a) minB.BackgroundColor3=a end)
+local side=make("Frame",{Position=UDim2.fromOffset(10,50),Size=UDim2.new(0,112,1,-60),BackgroundColor3=COL.Side,BackgroundTransparency=.45},win)
+round(side,20)
+local menu=make("Frame",{Size=UDim2.new(1,0,1,-56),BackgroundTransparency=1},side)
+make("UIListLayout",{Padding=UDim.new(0,5),SortOrder=Enum.SortOrder.LayoutOrder},menu)
+make("UIPadding",{PaddingTop=UDim.new(0,10),PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8)},menu)
+local content=make("Frame",{Position=UDim2.fromOffset(130,50),Size=UDim2.new(1,-140,1,-60),BackgroundTransparency=1,ClipsDescendants=true},win)
+
+local pages,btns,ord={}, {},0
+local TI=TweenInfo.new(.3,Enum.EasingStyle.Quint)
+local function select(name)
+ for n,p in pairs(pages) do
+  if n==name then
+   if not p.Visible then
+    p.Visible=true p.Position=UDim2.fromOffset(18,0)
+    TS:Create(p,TI,{Position=UDim2.new()}):Play()
+   end
+  else p.Visible=false end
+ end
+ for n,b in pairs(btns) do TS:Create(b,TI,{BackgroundTransparency=(n==name) and 0 or 1}):Play() end
+end
+local function section(en,th)
+ ord+=1
+ L(make("TextLabel",{LayoutOrder=ord,Size=UDim2.new(1,0,0,14),BackgroundTransparency=1,Font=Enum.Font.GothamBold,TextSize=9,TextColor3=COL.Sub,TextXAlignment=Enum.TextXAlignment.Left},menu),en,th)
+end
+local function addPage(name,icon,en,th)
+ ord+=1
+ local b=make("TextButton",{LayoutOrder=ord,Size=UDim2.new(1,0,0,32),BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Text="",AutoButtonColor=false},menu)
+ round(b,16)
+ local g=make("UIGradient",{},b)
+ onAccent(function(a,c2) g.Color=ColorSequence.new(a,c2) end)
+ make("TextLabel",{Position=UDim2.fromOffset(8,0),Size=UDim2.fromOffset(20,32),BackgroundTransparency=1,Text=icon,TextSize=14},b)
+ L(make("TextLabel",{Position=UDim2.fromOffset(32,0),Size=UDim2.new(1,-36,1,0),BackgroundTransparency=1,Font=Enum.Font.GothamBold,TextSize=12,TextColor3=Color3.new(1,1,1),TextXAlignment=Enum.TextXAlignment.Left},b),en,th)
+ local p=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,Visible=false},content)
+ pages[name]=p btns[name]=b
+ b.MouseButton1Click:Connect(function() select(name) end)
+ return p
+end
+section("MAIN","หลัก")
+addPage("home","🏠","Home","หน้าหลัก")
+section("SYSTEM","ระบบ")
+addPage("settings","⚙️","Settings","ตั้งค่า")
+select("home")
+local state={scale=1,alpha=0,key=true}
+
+local logo=make("ImageButton",{AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(0,0),Position=UDim2.new(0,42,.5,0),BackgroundColor3=COL.Bg,Image=LOGO,AutoButtonColor=false},gui)
+round(logo,26) glow(logo,1.5)
+TS:Create(make("UIScale",{},logo),TweenInfo.new(1.8,SINE,IO,-1,true),{Scale=1.06}):Play()
+
+local function ripple()
+ local r=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromScale(1,1),BackgroundTransparency=1},logo)
+ make("UICorner",{CornerRadius=UDim.new(.5,0)},r)
+ local s=make("UIStroke",{Color=COL.Pink,Thickness=1.5,Transparency=.2},r)
+ TS:Create(r,TweenInfo.new(1.4,Enum.EasingStyle.Quint),{Size=UDim2.fromScale(2,2)}):Play()
+ TS:Create(s,TweenInfo.new(1.4),{Transparency=1}):Play()
+ task.delay(1.5,function() r:Destroy() end)
+end
+local function burst()
+ for i=1,10 do
+  local a=math.rad(i*36)
+  local d=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(5,5),BackgroundColor3=(i%2==0) and COL.Pink or COL.Purple},logo)
+  make("UICorner",{CornerRadius=UDim.new(.5,0)},d)
+  TS:Create(d,TweenInfo.new(.7,Enum.EasingStyle.Quint),{Position=UDim2.new(.5,math.cos(a)*48,.5,math.sin(a)*48),BackgroundTransparency=1,Size=UDim2.fromOffset(2,2)}):Play()
+  task.delay(.8,function() d:Destroy() end)
+ end
+end
+
+local open,busy=false,false
+local winPos=UDim2.new(.5,0,.5,0)
+local function setOpen(v)
+ if busy or v==open then return end
+ busy=true open=v
+ burst()
+ logo.Rotation=0
+ TS:Create(logo,TweenInfo.new(.6,Enum.EasingStyle.Back),{Rotation=360}):Play()
+ task.delay(.65,function() logo.Rotation=0 busy=false end)
+ if v then
+  win.Visible=true
+  win.Position=logo.Position
+  sc.Scale=.05 win.GroupTransparency=1
+  local ti=TweenInfo.new(.55,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+  TS:Create(win,ti,{Position=winPos,GroupTransparency=state.alpha}):Play()
+  TS:Create(sc,ti,{Scale=state.scale}):Play()
+ else
+  winPos=win.Position
+  local ti=TweenInfo.new(.38,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
+  TS:Create(win,ti,{Position=logo.Position,GroupTransparency=1}):Play()
+  TS:Create(sc,ti,{Scale=.05}):Play()
+  task.delay(.4,function() if not open then win.Visible=false end end)
+ end
+end
+
+local function drag(handle,target,onClick)
+ local d,ds,sp,moved
+ handle.InputBegan:Connect(function(i)
+  if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+   d=true moved=false ds=i.Position sp=target.Position
+   i.Changed:Connect(function()
+    if i.UserInputState==Enum.UserInputState.End then
+     d=false
+     if onClick and not moved then onClick() end
+    end
+   end)
+  end
+ end)
+ UIS.InputChanged:Connect(function(i)
+  if d and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+   local v=i.Position-ds
+   if v.Magnitude>6 then moved=true end
+   target.Position=UDim2.new(sp.X.Scale,sp.X.Offset+v.X,sp.Y.Scale,sp.Y.Offset+v.Y)
+  end
+ end)
+end
+drag(top,win)
+drag(logo,logo,function() setOpen(not open) end)
+minB.MouseButton1Click:Connect(function() setOpen(false) end)
+clsB.MouseButton1Click:Connect(function() gui:Destroy() end)
+UIS.InputBegan:Connect(function(i,gp)
+ if not gp and state.key and i.KeyCode==Enum.KeyCode.RightShift then setOpen(not open) end
+end)
+
+task.spawn(function()
+ while gui:IsDescendantOf(game) do
+  if not open then ripple() end
+  task.wait(2.4)
+ end
+end)
+
+getgenv().NX={COL=COL,make=make,round=round,glow=glow,L=L,setLang=setLang,getLang=function() return lang end,
+ content=content,sub=sub,side=side,pages=pages,onAccent=onAccent,setAccent=setAccent,setSpace=setSpace,
+ state=state,win=win,sc=sc,setOpen=setOpen,isOpen=function() return open end}
+
+TS:Create(logo,TweenInfo.new(.5,Enum.EasingStyle.Back),{Size=UDim2.fromOffset(52,52)}):Play()
+task.delay(.6,function() setOpen(true) end)
+local NX=getgenv().NX
+local COL,make,round,glow,L=NX.COL,NX.make,NX.round,NX.glow,NX.L
+local Players=game:GetService("Players")
+local TS=game:GetService("TweenService")
+local RS=game:GetService("RunService")
+local Stats=game:GetService("Stats")
+local MPS=game:GetService("MarketplaceService")
+local lp=Players.LocalPlayer
+local TI=TweenInfo.new(.35,Enum.EasingStyle.Quint)
+local c=NX.pages.home
+local CEN=Enum.TextXAlignment.Center
+
+local function txt(p,props)
+ props.BackgroundTransparency=1
+ props.Font=props.Font or Enum.Font.GothamBold
+ props.TextColor3=props.TextColor3 or COL.Text
+ props.TextXAlignment=props.TextXAlignment or Enum.TextXAlignment.Left
+ return make("TextLabel",props,p)
+end
+local function pop(o,d)
+ local s=make("UIScale",{Scale=0},o)
+ task.delay(d,function() TS:Create(s,TweenInfo.new(.45,Enum.EasingStyle.Back),{Scale=1}):Play() end)
+end
+local function tag(p,props)
+ props.AutomaticSize=Enum.AutomaticSize.X
+ props.Size=UDim2.fromOffset(0,16)
+ props.BackgroundColor3=COL.Bg
+ props.BackgroundTransparency=.35
+ props.Font=Enum.Font.GothamBold
+ props.TextSize=9
+ props.TextColor3=COL.Text
+ local t=make("TextLabel",props,p)
+ round(t,8)
+ make("UIPadding",{PaddingLeft=UDim.new(0,8),PaddingRight=UDim.new(0,8)},t)
+ return t
+end
+
+-- แถวหัวข้อ + แท็ก
+local th=make("Frame",{Size=UDim2.new(1,0,0,20),BackgroundTransparency=1},c)
+local tl=L(txt(th,{Position=UDim2.fromOffset(2,0),Size=UDim2.fromOffset(110,20),Font=Enum.Font.GothamBlack,TextSize=17,TextColor3=Color3.new(1,1,1)}),"HOME","หน้าหลัก")
+local tlg=make("UIGradient",{},tl)
+NX.onAccent(function(a,b) tlg.Color=ColorSequence.new(a,b) end)
+local tr=make("Frame",{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,0,0,2),Size=UDim2.new(.7,0,0,16),BackgroundTransparency=1},th)
+make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,HorizontalAlignment=Enum.HorizontalAlignment.Right,Padding=UDim.new(0,5),SortOrder=Enum.SortOrder.LayoutOrder},tr)
+L(tag(tr,{LayoutOrder=1}),"🎂 "..lp.AccountAge.." days","🎂 "..lp.AccountAge.." วัน")
+tag(tr,{LayoutOrder=2,Text="🆔 "..lp.UserId})
+
+-- โปรไฟล์
+local pg=make("Frame",{Position=UDim2.fromOffset(0,26),Size=UDim2.new(1,-156,0,58),BackgroundTransparency=1},c)
+local ring=make("Frame",{Position=UDim2.fromOffset(0,2),Size=UDim2.fromOffset(54,54),BackgroundTransparency=1},pg)
+round(ring,27) glow(ring,1.5)
+TS:Create(make("UIScale",{},ring),TweenInfo.new(1.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),{Scale=1.07}):Play()
+local av=make("ImageLabel",{Size=UDim2.fromOffset(46,46),Position=UDim2.fromOffset(4,6),BackgroundColor3=COL.Side},pg)
+round(av,23)
+task.spawn(function()
+ local ok,img=pcall(function() return Players:GetUserThumbnailAsync(lp.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size150x150) end)
+ if ok then av.Image=img end
+end)
+local nm=txt(pg,{Position=UDim2.fromOffset(66,4),Size=UDim2.new(1,-66,0,18),Text=lp.DisplayName,Font=Enum.Font.GothamBlack,TextSize=15,TextColor3=Color3.new(1,1,1),TextTruncate=Enum.TextTruncate.AtEnd})
+local ng=make("UIGradient",{},nm)
+NX.onAccent(function(a,b) ng.Color=ColorSequence.new(b,a) end)
+txt(pg,{Position=UDim2.fromOffset(66,22),Size=UDim2.new(1,-66,0,12),Text="@"..lp.Name,Font=Enum.Font.Gotham,TextSize=10,TextColor3=COL.Sub,TextTruncate=Enum.TextTruncate.AtEnd})
+local hpBack=make("Frame",{Position=UDim2.fromOffset(66,38),Size=UDim2.new(1,-66,0,16),BackgroundColor3=COL.Chip,BackgroundTransparency=.3},pg)
+round(hpBack,8)
+local fill=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundColor3=COL.Green,ClipsDescendants=true},hpBack)
+round(fill,8)
+local shine=make("Frame",{Size=UDim2.fromScale(.25,1),Position=UDim2.fromScale(-.3,0),BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=.7,BorderSizePixel=0},fill)
+round(shine,8)
+TS:Create(shine,TweenInfo.new(1.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,false,1),{Position=UDim2.fromScale(1.05,0)}):Play()
+local hpTxt=txt(hpBack,{Size=UDim2.fromScale(1,1),Text="❤ -- / --",TextSize=10,TextColor3=Color3.new(1,1,1),TextXAlignment=CEN,ZIndex=2})
+pop(pg,.05)
+
+local function bindChar(ch)
+ local hum=ch:WaitForChild("Humanoid",5)
+ if not hum then return end
+ local function upd()
+  local r=math.clamp(hum.Health/math.max(hum.MaxHealth,1),0,1)
+  TS:Create(fill,TI,{Size=UDim2.fromScale(r,1),BackgroundColor3=COL.Red:Lerp(COL.Green,r)}):Play()
+  hpTxt.Text="❤ "..math.floor(hum.Health).." / "..math.floor(hum.MaxHealth)
+ end
+ hum.HealthChanged:Connect(upd)
+ hum:GetPropertyChangedSignal("MaxHealth"):Connect(upd)
+ upd()
+end
+if lp.Character then task.spawn(bindChar,lp.Character) end
+lp.CharacterAdded:Connect(bindChar)
+
+-- ข้อมูลตัวละครฝั่งขวา
+local rp=make("Frame",{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,0,0,26),Size=UDim2.fromOffset(148,58),BackgroundTransparency=1},c)
+local function pill(y,icon)
+ local p=make("Frame",{Position=UDim2.fromOffset(0,y),Size=UDim2.new(1,0,0,26),BackgroundColor3=COL.Chip,BackgroundTransparency=.4},rp)
+ round(p,13) glow(p,1)
+ return txt(p,{Size=UDim2.fromScale(1,1),TextSize=10,TextXAlignment=CEN,Text=icon.." --"})
+end
+local spdL=pill(0,"🏃")
+local posL=pill(32,"📍")
+pop(rp,.1)
+local N,W,H=26,144,30
+local function chart(i,en,th2,unit,maxLbl,midLbl)
+ local f=make("Frame",{Position=UDim2.new(i*.5,i*4,0,90),Size=UDim2.new(.5,-4,0,78),BackgroundColor3=COL.Chip,BackgroundTransparency=.35},c)
+ round(f,18) glow(f,1.6)
+ L(txt(f,{Position=UDim2.fromOffset(12,6),Size=UDim2.new(.5,0,0,10),TextSize=9,TextColor3=COL.Sub}),en,th2)
+ local avg=txt(f,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,6),Size=UDim2.new(.5,0,0,10),TextSize=9,TextColor3=COL.Sub,TextXAlignment=Enum.TextXAlignment.Right})
+ local v=txt(f,{Position=UDim2.fromOffset(12,15),Size=UDim2.new(.7,0,0,18),TextSize=16,Text="--"})
+ -- กรอบกราฟ
+ local gf=make("Frame",{Position=UDim2.fromOffset(10,36),Size=UDim2.new(1,-20,0,38),BackgroundColor3=COL.Bg,BackgroundTransparency=.2},f)
+ round(gf,10)
+ local gs=make("UIStroke",{Color=COL.Pink,Thickness=1.4,Transparency=.05},gf)
+ NX.onAccent(function(a,b) gs.Color=b end)
+ local area=make("Frame",{Position=UDim2.fromOffset(26,4),Size=UDim2.fromOffset(W,H),BackgroundTransparency=1},gf)
+ -- เส้นกริด + ตัวเลขแกน
+ for g=0,2 do
+  make("Frame",{Position=UDim2.new(0,0,g/2,g==2 and -1 or 0),Size=UDim2.new(1,0,0,1),BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=.78,BorderSizePixel=0},area)
+  txt(gf,{Position=UDim2.fromOffset(3,4+g*H/2-5),Size=UDim2.fromOffset(22,10),Font=Enum.Font.Gotham,TextSize=7,TextColor3=COL.Sub,TextXAlignment=Enum.TextXAlignment.Right,Text=(g==0) and maxLbl or ((g==1) and midLbl or "0")})
+ end
+ for g=1,3 do
+  make("Frame",{Position=UDim2.new(g/4,0,0,0),Size=UDim2.new(0,1,1,0),BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=.9,BorderSizePixel=0},area)
+ end
+ local cols,segs={},{}
+ for k=1,N do
+  cols[k]=make("Frame",{AnchorPoint=Vector2.new(.5,1),Position=UDim2.fromOffset((k-1)/(N-1)*W,H),Size=UDim2.fromOffset(math.ceil(W/N),0),BackgroundColor3=COL.Purple,BorderSizePixel=0},area)
+  make("UIGradient",{Rotation=90,Transparency=NumberSequence.new(.5,1)},cols[k])
+ end
+ for k=1,N-1 do
+  segs[k]=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(0,2),BackgroundColor3=COL.Purple,BorderSizePixel=0},area)
+ end
+ local dot=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(7,7),Position=UDim2.fromOffset(W,H),BackgroundColor3=Color3.new(1,1,1)},area)
+ round(dot,4)
+ pop(f,.15+i*.1)
+ local vals,norm={},{}
+ for k=1,N do vals[k]=0 norm[k]=0 end
+ local ti=TweenInfo.new(.35,Enum.EasingStyle.Quint)
+ return function(val,n,good)
+  table.remove(vals,1) table.insert(vals,val)
+  table.remove(norm,1) table.insert(norm,n)
+  local s,cnt=0,0
+  for _,x in ipairs(vals) do if x>0 then s+=x cnt+=1 end end
+  avg.Text="avg "..math.floor(s/math.max(cnt,1))
+  v.Text=val..unit
+  local col=COL.Red:Lerp(COL.Green,good)
+  TS:Create(v,ti,{TextColor3=col}):Play()
+  local px,py={},{}
+  for k=1,N do
+   px[k]=(k-1)/(N-1)*W
+   py[k]=H-math.max(norm[k],.05)*H
+   cols[k].BackgroundColor3=col
+   TS:Create(cols[k],ti,{Size=UDim2.fromOffset(math.ceil(W/N),H-py[k])}):Play()
+  end
+  for k=1,N-1 do
+   local dx,dy=px[k+1]-px[k],py[k+1]-py[k]
+   segs[k].BackgroundColor3=col
+   TS:Create(segs[k],ti,{Position=UDim2.fromOffset(px[k]+dx/2,py[k]+dy/2),Size=UDim2.fromOffset(math.sqrt(dx*dx+dy*dy)+1.5,2),Rotation=math.deg(math.atan2(dy,dx))}):Play()
+  end
+  dot.BackgroundColor3=col
+  TS:Create(dot,ti,{Position=UDim2.fromOffset(W,py[N])}):Play()
+ end
+end
+local updFps=chart(0,"⚡ FPS","⚡ FPS","","60","30")
+local updPing=chart(1,"📡 Ping","📡 ปิง"," ms","300","150")
+
+local frames,acc=0,0
+local conn
+conn=RS.RenderStepped:Connect(function(dt)
+ if not c:IsDescendantOf(game) then conn:Disconnect() return end
+ frames+=1 acc+=dt
+ if acc<.6 then return end
+ local fps=math.floor(frames/acc+.5)
+ frames,acc=0,0
+ local r=math.clamp(fps/60,0,1)
+ updFps(fps,r,r)
+ local ok,ms=pcall(function() return Stats.Network.ServerStatsItem["Data Ping"]:GetValue() end)
+ if ok and ms then
+  ms=math.floor(ms)
+  local q=math.clamp(ms/300,0,1)
+  updPing(ms,q,1-q)
+ end
+end)
+-- ปกแมพ
+local mp=make("Frame",{Position=UDim2.fromOffset(0,174),Size=UDim2.new(1,0,0,64),BackgroundTransparency=1,ClipsDescendants=true},c)
+round(mp,20) glow(mp,1.6)
+local aur=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0},mp)
+round(aur,20)
+local ag=make("UIGradient",{Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(90,50,200)),ColorSequenceKeypoint.new(.5,Color3.fromRGB(30,20,90)),ColorSequenceKeypoint.new(1,Color3.fromRGB(190,100,240))})},aur)
+TS:Create(ag,TweenInfo.new(6,Enum.EasingStyle.Linear,Enum.EasingDirection.In,-1),{Rotation=360}):Play()
+local img=make("ImageLabel",{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,ImageTransparency=1,ScaleType=Enum.ScaleType.Crop},mp)
+round(img,20)
+local ov=make("Frame",{Size=UDim2.fromScale(1,1),BackgroundColor3=Color3.new(0,0,0),BorderSizePixel=0},mp)
+round(ov,20)
+make("UIGradient",{Rotation=90,Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,.8),NumberSequenceKeypoint.new(.5,.6),NumberSequenceKeypoint.new(1,.1)})},ov)
+local sh=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.new(-.2,0,.5,0),Size=UDim2.new(0,28,2,0),Rotation=20,BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=.88,BorderSizePixel=0},mp)
+TS:Create(sh,TweenInfo.new(2.2,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,false,1.5),{Position=UDim2.new(1.2,0,.5,0)}):Play()
+L(txt(mp,{Position=UDim2.fromOffset(14,8),Size=UDim2.new(1,-190,0,12),Font=Enum.Font.Gotham,TextSize=10,TextColor3=COL.Pink}),"🗺 Current map","🗺 แมพที่เล่นอยู่")
+local mn=txt(mp,{Position=UDim2.fromOffset(14,28),Size=UDim2.new(1,-28,0,28),Text=game.Name,Font=Enum.Font.GothamBlack,TextSize=17,TextTruncate=Enum.TextTruncate.AtEnd})
+local mt=make("Frame",{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-10,0,7),Size=UDim2.new(0,180,0,16),BackgroundTransparency=1},mp)
+make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,HorizontalAlignment=Enum.HorizontalAlignment.Right,Padding=UDim.new(0,5),SortOrder=Enum.SortOrder.LayoutOrder},mt)
+local pl=tag(mt,{LayoutOrder=1,Text="👥 -- / --"})
+local tm=tag(mt,{LayoutOrder=2,Text="⏱ 00:00:00"})
+pop(mp,.3)
+
+local srcs={
+ "rbxthumb://type=GameIcon&id="..game.GameId.."&w=256&h=256",
+ "rbxthumb://type=GameIcon&id="..game.GameId.."&w=150&h=150",
+ "rbxthumb://type=Asset&id="..game.PlaceId.."&w=420&h=420",
+}
+task.spawn(function()
+ for _,s in ipairs(srcs) do
+  img.Image=s
+  local t=0
+  while not img.IsLoaded and t<3 do task.wait(.2) t+=.2 end
+  if img.IsLoaded then TS:Create(img,TweenInfo.new(.8),{ImageTransparency=0}):Play() return end
+ end
+ img.Image=""
+end)
+task.spawn(function()
+ local ok,info=pcall(function() return MPS:GetProductInfo(game.PlaceId) end)
+ if ok and info then mn.Text=info.Name NX.sub.Text=info.Name end
+end)
+
+-- ชิปข้อมูลด้านล่าง (กดคัดลอกได้)
+local cr=make("Frame",{Position=UDim2.fromOffset(0,244),Size=UDim2.new(1,0,0,22),BackgroundTransparency=1},c)
+make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder},cr)
+local function chipBtn(i,text,copyVal)
+ local b=make("TextButton",{LayoutOrder=i,Size=UDim2.new(1/3,-3,1,0),BackgroundColor3=COL.Chip,BackgroundTransparency=.4,AutoButtonColor=false,Text=text,Font=Enum.Font.GothamBold,TextSize=9,TextColor3=COL.Text},cr)
+ round(b,11) glow(b,1)
+ if copyVal then
+  b.MouseButton1Click:Connect(function()
+   pcall(function() setclipboard(copyVal) end)
+   local old=b.Text
+   b.Text="✔ copied"
+   task.delay(1,function() b.Text=old end)
+  end)
+ end
+ pop(b,.4+i*.05)
+ return b
+end
+local memB=chipBtn(1,"🧠 -- MB")
+chipBtn(2,"📍 "..game.PlaceId,tostring(game.PlaceId))
+chipBtn(3,"🔗 "..string.sub(game.JobId,1,8),game.JobId)
+
+-- สถานะใต้เมนูข้าง
+local st=make("Frame",{AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,8,1,-8),Size=UDim2.new(1,-16,0,42),BackgroundColor3=COL.Chip,BackgroundTransparency=.4},NX.side)
+round(st,16)
+local dot=make("Frame",{Position=UDim2.fromOffset(10,8),Size=UDim2.fromOffset(7,7),BackgroundColor3=COL.Green},st)
+round(dot,4)
+TS:Create(dot,TweenInfo.new(.9,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),{BackgroundTransparency=.8}):Play()
+L(txt(st,{Position=UDim2.fromOffset(22,4),Size=UDim2.new(1,-26,0,14),TextSize=10,TextColor3=COL.Green}),"Online","ออนไลน์")
+local clk=txt(st,{Position=UDim2.fromOffset(10,20),Size=UDim2.new(1,-14,0,16),TextSize=14,Text=os.date("%H:%M:%S")})
+
+-- ลูปอัปเดตสด
+task.spawn(function()
+ while c:IsDescendantOf(game) do
+  local t=math.floor(workspace.DistributedGameTime)
+  tm.Text=string.format("⏱ %02d:%02d:%02d",math.floor(t/3600),math.floor(t%3600/60),t%60)
+  pl.Text="👥 "..#Players:GetPlayers().." / "..Players.MaxPlayers
+  clk.Text=os.date("%H:%M:%S")
+  local ok,mem=pcall(function() return math.floor(Stats:GetTotalMemoryUsageMb()) end)
+  if ok then memB.Text="🧠 "..mem.." MB" end
+  task.wait(1)
+ end
+end)
+task.spawn(function()
+ while c:IsDescendantOf(game) do
+  local ch=lp.Character
+  local hum=ch and ch:FindFirstChildOfClass("Humanoid")
+  local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+  if hum then spdL.Text="🏃 "..(math.floor(hum.WalkSpeed*10)/10).." speed" end
+  if hrp then
+   local p=hrp.Position
+   posL.Text=string.format("📍 %d, %d, %d",math.floor(p.X),math.floor(p.Y),math.floor(p.Z))
+  end
+  task.wait(.25)
+ end
+end)
+
+NX.setLang("TH")
+local NX=getgenv().NX
+local COL,make,round,L=NX.COL,NX.make,NX.round,NX.L
+local TS=game:GetService("TweenService")
+local UIS=game:GetService("UserInputService")
+local HttpService=game:GetService("HttpService")
+local TeleportService=game:GetService("TeleportService")
+local Players=game:GetService("Players")
+local lp=Players.LocalPlayer
+local TI=TweenInfo.new(.2,Enum.EasingStyle.Quint)
+local S=NX.state
+local DEF={scale=1,alpha=0,accent=1,space=true,afk=false,fps=0,key=true}
+for k,v in pairs(DEF) do if S[k]==nil then S[k]=v end end
+
+-- โหลด/บันทึกการตั้งค่า (ถ้า executor รองรับ)
+local FILE="NexoraHub_Settings.json"
+pcall(function()
+ if isfile and isfile(FILE) then
+  for k,v in pairs(HttpService:JSONDecode(readfile(FILE))) do S[k]=v end
+ end
+end)
+local function save() pcall(function() if writefile then writefile(FILE,HttpService:JSONEncode(S)) end end) end
+local function T(en,th) return (NX.getLang()=="TH") and th or en end
+
+local sf=make("ScrollingFrame",{Size=UDim2.fromScale(1,1),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2,ScrollBarImageColor3=COL.Pink,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},NX.pages.settings)
+make("UIListLayout",{Padding=UDim.new(0,6),SortOrder=Enum.SortOrder.LayoutOrder},sf)
+make("UIPadding",{PaddingRight=UDim.new(0,6),PaddingBottom=UDim.new(0,8)},sf)
+local ord=0
+local ctrls={}
+
+local function txt(p,props)
+ props.BackgroundTransparency=1
+ props.Font=props.Font or Enum.Font.GothamBold
+ props.TextColor3=props.TextColor3 or COL.Text
+ props.TextXAlignment=props.TextXAlignment or Enum.TextXAlignment.Left
+ return make("TextLabel",props,p)
+end
+local function header(en,th,big)
+ ord+=1
+ local l=txt(sf,{LayoutOrder=ord,Size=UDim2.new(1,0,0,big and 22 or 16),Font=big and Enum.Font.GothamBlack or Enum.Font.GothamBold,TextSize=big and 17 or 10,TextColor3=big and Color3.new(1,1,1) or COL.Pink})
+ if big then
+  local g=make("UIGradient",{},l)
+  NX.onAccent(function(a,b) g.Color=ColorSequence.new(a,b) end)
+ end
+ L(l,en,th)
+end
+local function row(h)
+ ord+=1
+ local r=make("Frame",{LayoutOrder=ord,Size=UDim2.new(1,0,0,h),BackgroundColor3=COL.Chip,BackgroundTransparency=.4},sf)
+ round(r,14)
+ local s=make("UIStroke",{Color=COL.Pink,Transparency=.65,Thickness=1},r)
+ NX.onAccent(function(a,b) s.Color=b end)
+ return r
+end
+local function titles(r,en,th,dEn,dTh,w)
+ L(txt(r,{Position=UDim2.fromOffset(14,6),Size=UDim2.new(1,w or -80,0,16),TextSize=12}),en,th)
+ if dEn then L(txt(r,{Position=UDim2.fromOffset(14,22),Size=UDim2.new(1,w or -80,0,14),Font=Enum.Font.Gotham,TextSize=9,TextColor3=COL.Sub}),dEn,dTh) end
+end
+
+local function toggle(key,en,th,dEn,dTh,cb)
+ local r=row(42)
+ titles(r,en,th,dEn,dTh)
+ local sw=make("TextButton",{Text="",AutoButtonColor=false,Size=UDim2.fromOffset(38,20),Position=UDim2.new(1,-52,.5,-10),BackgroundColor3=COL.Bg},r)
+ round(sw,10)
+ local knob=make("Frame",{Size=UDim2.fromOffset(14,14),Position=UDim2.fromOffset(3,3),BackgroundColor3=Color3.new(1,1,1)},sw)
+ round(knob,7)
+ local function set(v,fire)
+  S[key]=v
+  TS:Create(sw,TI,{BackgroundColor3=v and COL.Purple or COL.Bg}):Play()
+  TS:Create(knob,TI,{Position=v and UDim2.fromOffset(21,3) or UDim2.fromOffset(3,3)}):Play()
+  if fire then cb(v) save() end
+ end
+ sw.MouseButton1Click:Connect(function() set(not S[key],true) end)
+ set(S[key],false)
+ ctrls[key]=set
+end
+
+local function button(en,th,dEn,dTh,bEn,bTh,cb,dyn)
+ local r=row(42)
+ L(txt(r,{Position=UDim2.fromOffset(14,6),Size=UDim2.new(1,-110,0,16),TextSize=12}),en,th)
+ local d=txt(r,{Position=UDim2.fromOffset(14,22),Size=UDim2.new(1,-110,0,14),Font=Enum.Font.Gotham,TextSize=9,TextColor3=COL.Sub,TextTruncate=Enum.TextTruncate.AtEnd})
+ if dyn then d.Text=T(dEn,dTh) else L(d,dEn,dTh) end
+ local b=make("TextButton",{AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-10,.5,0),Size=UDim2.fromOffset(84,26),BackgroundColor3=COL.Purple,Text="",AutoButtonColor=false},r)
+ round(b,13)
+ NX.onAccent(function(a) b.BackgroundColor3=a end)
+ local bl=L(txt(b,{Size=UDim2.fromScale(1,1),TextSize=10,TextColor3=Color3.new(1,1,1),TextXAlignment=Enum.TextXAlignment.Center}),bEn,bTh)
+ b.MouseButton1Click:Connect(function() cb(d,bl,b) end)
+ return d,bl
+end
+local function slider(key,en,th,min,max,fmt,onRelease,cb)
+ local r=row(50)
+ titles(r,en,th,nil,nil,-90)
+ local vl=txt(r,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-14,0,6),Size=UDim2.fromOffset(70,16),TextSize=11,TextColor3=COL.Pink,TextXAlignment=Enum.TextXAlignment.Right})
+ local track=make("Frame",{Position=UDim2.new(0,14,0,34),Size=UDim2.new(1,-28,0,6),BackgroundColor3=COL.Bg},r)
+ round(track,3)
+ local fill=make("Frame",{Size=UDim2.fromScale(0,1),BackgroundColor3=COL.Purple},track)
+ round(fill,3)
+ local knob=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(0,.5),Size=UDim2.fromOffset(14,14),BackgroundColor3=Color3.new(1,1,1)},track)
+ round(knob,7)
+ NX.onAccent(function(a) fill.BackgroundColor3=a end)
+ local hit=make("TextButton",{Text="",BackgroundTransparency=1,Position=UDim2.new(0,14,0,22),Size=UDim2.new(1,-28,0,26)},r)
+ local function show(v)
+  local t=(v-min)/(max-min)
+  fill.Size=UDim2.fromScale(t,1) knob.Position=UDim2.fromScale(t,.5)
+  vl.Text=fmt(v)
+ end
+ local function set(v,fire)
+  v=math.clamp(v,min,max) S[key]=v show(v)
+  if fire then cb(v) end
+ end
+ local dragging=false
+ local function fromX(x)
+  local t=math.clamp((x-track.AbsolutePosition.X)/track.AbsoluteSize.X,0,1)
+  local v=min+(max-min)*t
+  S[key]=v show(v)
+  if not onRelease then cb(v) end
+ end
+ local function isPtr(i) return i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch end
+ hit.InputBegan:Connect(function(i) if isPtr(i) then dragging=true fromX(i.Position.X) end end)
+ UIS.InputChanged:Connect(function(i)
+  if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then fromX(i.Position.X) end
+ end)
+ UIS.InputEnded:Connect(function(i)
+  if dragging and isPtr(i) then
+   dragging=false
+   if onRelease then cb(S[key]) end
+   save()
+  end
+ end)
+ show(S[key])
+ ctrls[key]=set
+end
+
+-- ตัวเลือกหลายปุ่ม (ล็อก FPS)
+local function segmented(key,en,th,opts,cb)
+ local r=row(56)
+ titles(r,en,th)
+ local holder=make("Frame",{Position=UDim2.fromOffset(14,26),Size=UDim2.new(1,-28,0,24),BackgroundTransparency=1},r)
+ make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.new(0,5)},holder)
+ local bs={}
+ local function mark()
+  for v,b in pairs(bs) do
+   TS:Create(b,TI,{BackgroundColor3=(S[key]==v) and COL.Purple or COL.Bg}):Play()
+  end
+ end
+ for _,o in ipairs(opts) do
+  local b=make("TextButton",{Size=UDim2.new(1/#opts,-4,1,0),BackgroundColor3=COL.Bg,Text=o[2],Font=Enum.Font.GothamBold,TextSize=10,TextColor3=COL.Text,AutoButtonColor=false},holder)
+  round(b,12)
+  bs[o[1]]=b
+  b.MouseButton1Click:Connect(function() S[key]=o[1] mark() cb(o[1]) save() end)
+ end
+ mark()
+ ctrls[key]=function(v,fire) S[key]=v mark() if fire then cb(v) end end
+end
+
+-- เลือกสีธีม
+local PRESETS={
+ {Color3.fromRGB(140,80,255),Color3.fromRGB(215,125,255)},
+ {Color3.fromRGB(50,130,255),Color3.fromRGB(110,220,255)},
+ {Color3.fromRGB(255,70,160),Color3.fromRGB(255,150,210)},
+ {Color3.fromRGB(35,200,120),Color3.fromRGB(140,255,190)},
+ {Color3.fromRGB(255,130,40),Color3.fromRGB(255,205,90)},
+}
+local function colorRow()
+ local r=row(56)
+ titles(r,"Theme color","สีธีม")
+ local holder=make("Frame",{Position=UDim2.fromOffset(14,26),Size=UDim2.new(1,-28,0,24),BackgroundTransparency=1},r)
+ make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.new(0,10)},holder)
+ local sts={}
+ local function mark()
+  for i,s in ipairs(sts) do s.Transparency=(S.accent==i) and 0 or 1 end
+ end
+ for i,p in ipairs(PRESETS) do
+  local b=make("TextButton",{Size=UDim2.fromOffset(24,24),BackgroundColor3=p[1],Text="",AutoButtonColor=false},holder)
+  round(b,12)
+  make("UIGradient",{Color=ColorSequence.new(p[1],p[2]),Rotation=45},b)
+  sts[i]=make("UIStroke",{Color=Color3.new(1,1,1),Thickness=2,Transparency=1},b)
+  b.MouseButton1Click:Connect(function() S.accent=i mark() NX.setAccent(p[1],p[2]) save() end)
+ end
+ mark()
+ ctrls.accent=function(i) S.accent=i mark() NX.setAccent(PRESETS[i][1],PRESETS[i][2]) end
+end
+-- ===== ค้นหาเซิร์ฟเวอร์ 0-1 คน =====
+local function httpGet(url)
+ local ok,res=pcall(function() return game:HttpGet(url) end)
+ if ok and res and #res>0 then return res end
+ local req=(syn and syn.request) or (http and http.request) or http_request or request
+ if req then
+  local ok2,r=pcall(req,{Url=url,Method="GET"})
+  if ok2 and r and r.Body then return r.Body end
+ end
+end
+local function findLow(status)
+ local best,cursor
+ for page=1,5 do
+  status("🔎 "..T("Searching... page ","กำลังค้นหา... หน้า ")..page)
+  local url="https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"..(cursor and ("&cursor="..cursor) or "")
+  local body=httpGet(url)
+  if not body then return nil,"http" end
+  local ok,data=pcall(function() return HttpService:JSONDecode(body) end)
+  if not ok or not data or not data.data then return nil,"parse" end
+  for _,s in ipairs(data.data) do
+   if s.id~=game.JobId and s.playing and s.playing<s.maxPlayers then
+    if s.playing<=1 then return s end
+    if not best or s.playing<best.playing then best=s end
+   end
+  end
+  cursor=data.nextPageCursor
+  if not cursor then break end
+  task.wait(.5)
+ end
+ return nil,"none",best
+end
+
+header("SETTINGS","ตั้งค่า",true)
+header("SERVER","เซิร์ฟเวอร์")
+local pending,searching
+button("Find empty server","หาเซิร์ฟเวอร์คนน้อย","Find a server with 0-1 players and join","ค้นหาเซิร์ฟที่มี 0–1 คน แล้ววาร์ปไป","Search","ค้นหา",function(d,bl)
+ if searching then return end
+ if pending then
+  d.Text="🚀 "..T("Teleporting...","กำลังวาร์ป...")
+  pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId,pending.id,lp) end)
+  return
+ end
+ searching=true
+ task.spawn(function()
+  local s,err,best=findLow(function(t) d.Text=t end)
+  searching=false
+  if s then
+   d.Text="✅ "..T("Found ","พบเซิร์ฟ ")..s.playing..T(" player, joining..."," คน กำลังวาร์ป...")
+   pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId,s.id,lp) end)
+  elseif best then
+   pending=best
+   d.Text="⚠ "..T("None with 0-1. Lowest: ","ไม่พบ 0–1 คน ต่ำสุดคือ ")..best.playing..T(" - press again to join"," คน กดอีกครั้งเพื่อไป")
+   bl.Text=T("Join","ไป")
+  else
+   d.Text="❌ "..((err=="none") and T("No server found","ไม่พบเซิร์ฟเวอร์") or T("Request failed (HttpGet blocked?)","เรียกข้อมูลไม่ได้ (executor อาจไม่รองรับ)"))
+  end
+ end)
+end,true)
+button("Rejoin","รีจอยเซิร์ฟเวอร์นี้","Rejoin the current server","เข้าเซิร์ฟเวอร์เดิมใหม่","Rejoin","รีจอย",function()
+ if #Players:GetPlayers()<=1 then
+  pcall(function() TeleportService:Teleport(game.PlaceId,lp) end)
+ else
+  pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId,game.JobId,lp) end)
+ end
+end)
+button("Copy Job ID","คัดลอก Job ID","Copy this server's ID","คัดลอกไอดีเซิร์ฟเวอร์นี้","Copy","คัดลอก",function(d,bl)
+ pcall(function() setclipboard(game.JobId) end)
+ local o=bl.Text bl.Text="✔"
+ task.delay(1,function() bl.Text=o end)
+end)
+
+header("APPEARANCE","หน้าตา GUI")
+slider("scale","GUI size","ขนาด GUI",.7,1.3,function(v) return math.floor(v*100+.5).."%" end,true,function(v)
+ if NX.isOpen() then TS:Create(NX.sc,TweenInfo.new(.25,Enum.EasingStyle.Quint),{Scale=v}):Play() end
+end)
+slider("alpha","Transparency","ความโปร่งใส",0,.6,function(v) return math.floor(v*100+.5).."%" end,false,function(v)
+ if NX.isOpen() then NX.win.GroupTransparency=v end
+end)
+colorRow()
+toggle("space","Space effects","เอฟเฟกต์อวกาศ","Stars, nebula, shooting stars","ดาว เนบิวลา ดาวตก",function(v) NX.setSpace(v) end)
+
+header("GENERAL","ทั่วไป")
+local afkConn
+local function setAFK(v)
+ if afkConn then afkConn:Disconnect() afkConn=nil end
+ if v then
+  local VU=game:GetService("VirtualUser")
+  afkConn=lp.Idled:Connect(function() VU:CaptureController() VU:ClickButton2(Vector2.new()) end)
+ end
+end
+toggle("afk","Anti-AFK","กันหลุดเมื่อ AFK","Prevents idle kick (20 min)","กันโดนเตะเมื่อไม่ขยับ",setAFK)
+segmented("fps","FPS cap","ล็อก FPS",{{30,"30"},{60,"60"},{120,"120"},{240,"240"},{0,"∞"}},function(v)
+ pcall(function() if setfpscap then setfpscap(v==0 and 999 or v) end end)
+end)
+toggle("key","Hotkey (RightShift)","คีย์ลัด (RightShift)","Show / hide GUI with RightShift","ซ่อน/แสดง GUI ด้วย RightShift",function(v) S.key=v end)
+button("Reset character","รีเซ็ตตัวละคร","Respawn your character","เกิดใหม่","Reset","รีเซ็ต",function()
+ local ch=lp.Character
+ local h=ch and ch:FindFirstChildOfClass("Humanoid")
+ if h then h.Health=0 end
+end)
+button("Reset settings","รีเซ็ตการตั้งค่า","Restore default GUI settings","คืนค่าตั้งต้นของ GUI","Reset","รีเซ็ต",function()
+ for k,v in pairs(DEF) do S[k]=v end
+ colorSet=true
+ ctrls.accent(1)
+ ctrls.space(true,true) ctrls.afk(false,true) ctrls.key(true,true)
+ ctrls.scale(1,true) ctrls.alpha(0,true) ctrls.fps(0,true)
+ save()
+end)
+colorRow=nil
+
+-- ใช้ค่าที่บันทึกไว้ตอนเริ่ม
+ctrls.accent(S.accent)
+NX.setSpace(S.space)
+setAFK(S.afk)
+pcall(function() if setfpscap and S.fps~=0 then setfpscap(S.fps) end end)
+NX.setLang("TH")
